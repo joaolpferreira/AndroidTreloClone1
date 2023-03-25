@@ -1,0 +1,39 @@
+{
+  "project_info": {
+    "project_number": "1086882154725",
+    "project_id": "treloclone-aa893",
+    "storage_bucket": "treloclone-aa893.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:1086882154725:android:919f373955b706074e2c0c",
+        "android_client_info": {
+          "package_name": "com.example.treloclone"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "1086882154725-fs1mn76m8h5tn7vtbo0k0u980pkhkhd5.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyA5bXmHH0gBczgQagZip9uA38VebDuHgoM"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "1086882154725-fs1mn76m8h5tn7vtbo0k0u980pkhkhd5.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
