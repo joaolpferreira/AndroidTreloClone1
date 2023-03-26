@@ -13,6 +13,8 @@ import androidx.drawerlayout.widget.DrawerLayout
 import com.bumptech.glide.Glide
 import com.example.treloclone.R
 import com.example.treloclone.firebase.FireStoreClass
+import com.example.treloclone.utils.Constants
+import com.google.android.material.floatingactionbutton.FloatingActionButton
 import com.google.android.material.navigation.NavigationView
 import com.google.firebase.auth.FirebaseAuth
 import de.hdodenhof.circleimageview.CircleImageView
@@ -24,11 +26,12 @@ class MainActivity : BaseActivity(), NavigationView.OnNavigationItemSelectedList
     private var navView: NavigationView? = null
     private var ivUserImage: CircleImageView? = null
     private var tvUserName: TextView? = null
-
+    private var fabCreateBoard: FloatingActionButton? = null
     companion object{
         const val MY_PROFILE_REQUEST_CODE: Int = 11
     }
 
+    private lateinit var mUserName: String
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
@@ -38,11 +41,19 @@ class MainActivity : BaseActivity(), NavigationView.OnNavigationItemSelectedList
         navView = findViewById(R.id.nav_view)
         ivUserImage = findViewById(R.id.iv_user_image)
         tvUserName = findViewById(R.id.tv_username)
+        fabCreateBoard = findViewById(R.id.fab_create_board)
 
         setupActionBar()
         navView?.setNavigationItemSelectedListener (this)
 
         FireStoreClass().loadUserData(this)
+
+        fabCreateBoard?.setOnClickListener {
+            val intent = Intent(this, CreateBoardActivity::class.java)
+            intent.putExtra(Constants.NAME, mUserName)
+            startActivity(intent)
+        }
+
     }
 
     private fun setupActionBar(){
@@ -72,6 +83,8 @@ class MainActivity : BaseActivity(), NavigationView.OnNavigationItemSelectedList
     }
 
     fun updateNavigationUserDetails(user: com.example.treloclone.models.User){
+        mUserName = user.name
+
         val headerView = navView?.getHeaderView(0)
 
         // The instance of the user image of the navigation view.

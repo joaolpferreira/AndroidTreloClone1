@@ -3,10 +3,8 @@ package com.example.treloclone.firebase
 import android.app.Activity
 import android.util.Log
 import android.widget.Toast
-import com.example.treloclone.activities.MainActivity
-import com.example.treloclone.activities.MyProfileActivity
-import com.example.treloclone.activities.SignUpActivity
-import com.example.treloclone.activities.SignInActivity
+import com.example.treloclone.activities.*
+import com.example.treloclone.models.Board
 import com.example.treloclone.models.User
 import com.example.treloclone.utils.Constants
 import com.google.firebase.auth.FirebaseAuth
@@ -23,6 +21,19 @@ class FireStoreClass {
             .set(userInfo, SetOptions.merge())
             .addOnSuccessListener {
                 activity.userRegisteredSuccess()
+            }
+    }
+
+    fun createBoard(activity: CreateBoardActivity, board: Board){
+        mFireStore.collection(Constants.BOARDS)
+            .document().set(board,  SetOptions.merge())
+            .addOnSuccessListener {
+                Toast.makeText(activity, "Board created successfully.",Toast.LENGTH_SHORT).show()
+                activity.boardCreatedSuccessfully()
+            }.addOnFailureListener {
+                exception->
+                activity.hideProgressDialog()
+                Log.e(activity.javaClass.simpleName,"Error while creating a board.",exception)
             }
     }
 
