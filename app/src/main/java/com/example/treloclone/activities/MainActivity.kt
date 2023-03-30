@@ -5,18 +5,24 @@ import android.content.Intent
 import android.os.Bundle
 import android.util.Log
 import android.view.MenuItem
+import android.view.View
 import android.widget.ImageView
 import android.widget.TextView
 import androidx.appcompat.widget.Toolbar
 import androidx.core.view.GravityCompat
 import androidx.drawerlayout.widget.DrawerLayout
+import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
 import com.example.treloclone.R
 import com.example.treloclone.firebase.FireStoreClass
+import com.example.treloclone.models.Board
+import com.example.treloclone.models.User
 import com.example.treloclone.utils.Constants
 import com.google.android.material.floatingactionbutton.FloatingActionButton
 import com.google.android.material.navigation.NavigationView
 import com.google.firebase.auth.FirebaseAuth
+import com.projemanag.adapters.BoardItemsAdapter
 import de.hdodenhof.circleimageview.CircleImageView
 
 class MainActivity : BaseActivity(), NavigationView.OnNavigationItemSelectedListener {
@@ -27,6 +33,9 @@ class MainActivity : BaseActivity(), NavigationView.OnNavigationItemSelectedList
     private var ivUserImage: CircleImageView? = null
     private var tvUserName: TextView? = null
     private var fabCreateBoard: FloatingActionButton? = null
+    private var rvBoardsList: RecyclerView? = null
+    private var tvNoBoardsAvailable: TextView? = null
+
     companion object{
         const val MY_PROFILE_REQUEST_CODE: Int = 11
     }
@@ -42,11 +51,13 @@ class MainActivity : BaseActivity(), NavigationView.OnNavigationItemSelectedList
         ivUserImage = findViewById(R.id.iv_user_image)
         tvUserName = findViewById(R.id.tv_username)
         fabCreateBoard = findViewById(R.id.fab_create_board)
+        rvBoardsList = findViewById(R.id.rv_boards_list)
+        tvNoBoardsAvailable = findViewById(R.id.tv_no_boards_available)
 
         setupActionBar()
         navView?.setNavigationItemSelectedListener (this)
 
-        FireStoreClass().loadUserData(this)
+        FireStoreClass().loadUserData(this, true)
 
         fabCreateBoard?.setOnClickListener {
             val intent = Intent(this, CreateBoardActivity::class.java)
@@ -54,6 +65,24 @@ class MainActivity : BaseActivity(), NavigationView.OnNavigationItemSelectedList
             startActivity(intent)
         }
 
+    }
+
+    fun populateBoardsListToUI(boardsList: ArrayList<Board>){
+        hideProgressDialog()
+
+        if(boardsList.size > 0){
+            rvBoardsList?.visibility = View.VISIBLE
+            tvNoBoardsAvailable?.visibility = View.GONE
+
+            rvBoardsList?.layoutManager  = LinearLayoutManager(this)
+            rvBoardsList?.setHasFixedSize(true)
+
+            val adapter = BoardItemsAdapter(this, boardsList)
+            rvBoardsList?.adapter = adapter
+        }else{
+            rvBoardsList?.visibility = View.GONE
+            tvNoBoardsAvailable?.visibility = View.VISIBLE
+        }
     }
 
     private fun setupActionBar(){
@@ -82,7 +111,7 @@ class MainActivity : BaseActivity(), NavigationView.OnNavigationItemSelectedList
         }
     }
 
-    fun updateNavigationUserDetails(user: com.example.treloclone.models.User){
+    fun updateNavigationUserDetails(user: User, readBoardsList: Boolean){
         mUserName = user.name
 
         val headerView = navView?.getHeaderView(0)
@@ -103,6 +132,10 @@ class MainActivity : BaseActivity(), NavigationView.OnNavigationItemSelectedList
         // Set the user name
         navUsername.text = user.name
 
+        if(readBoardsList){
+            showProgressDialog(resources.getString(R.string.please_wait))
+            FireStoreClass().getBoardsList(this)
+        }
     }
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
