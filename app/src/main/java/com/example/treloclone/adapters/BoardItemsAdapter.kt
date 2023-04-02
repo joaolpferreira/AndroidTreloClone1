@@ -92,6 +92,7 @@ open class BoardItemsAdapter(
         fun onClick(position: Int, model: Board)
     }
 
+
     /**
      * A ViewHolder describes an item view and metadata about its place within the RecyclerView.
      */
