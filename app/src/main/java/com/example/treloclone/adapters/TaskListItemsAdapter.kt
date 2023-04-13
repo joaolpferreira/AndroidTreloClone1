@@ -1,5 +1,6 @@
 package com.example.treloclone.adapters
 
+import android.annotation.SuppressLint
 import android.content.Context
 import android.content.res.Resources
 import android.view.LayoutInflater
@@ -54,7 +55,7 @@ open class TaskListItemsAdapter(
      * of the given type. You can either create a new View manually or inflate it from an XML
      * layout file.
      */
-    override fun onBindViewHolder(holder: RecyclerView.ViewHolder, position: Int) {
+    override fun onBindViewHolder(holder: RecyclerView.ViewHolder, @SuppressLint("RecyclerView") position: Int) {
         val model = list[position]
 
         if (holder is MyViewHolder) {
@@ -148,6 +149,16 @@ open class TaskListItemsAdapter(
 
             val adapter = CardListItemsAdapter(context, model.cards)
             holder.itemView.findViewById<RecyclerView>(R.id.rv_card_list).adapter = adapter
+
+            adapter.setOnClickListener(
+                object : CardListItemsAdapter.OnClickListener{
+                    override fun onClick(cardPosition: Int) {
+                        if(context is TaskListActivity){
+                            context.cardDetails(position, cardPosition)
+                        }
+                    }
+                }
+            )
         }
     }
 

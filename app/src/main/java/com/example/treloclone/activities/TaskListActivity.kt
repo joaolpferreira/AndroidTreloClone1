@@ -1,5 +1,6 @@
 package com.example.treloclone.activities
 
+import android.app.Activity
 import android.content.Intent
 import android.os.Bundle
 import android.util.Log
@@ -20,11 +21,9 @@ class TaskListActivity : BaseActivity() {
     private var toolbarTaskListActivity: Toolbar? = null
     private var rvTaskList: RecyclerView? = null
 
-    // TODO (Step 2: Create a global variable for Board Details.)
-    // START
-    // A global variable for Board Details.
     private lateinit var mBoardDetails: Board
-    // END
+    private lateinit var mBoardDocumentId: String
+
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -33,16 +32,30 @@ class TaskListActivity : BaseActivity() {
         toolbarTaskListActivity = findViewById(R.id.toolbar_task_list_activity)
         rvTaskList = findViewById(R.id.rv_task_list)
 
-        var boardDocumentId = ""
         if (intent.hasExtra(Constants.DOCUMENT_ID)) {
-            boardDocumentId = intent.getStringExtra(Constants.DOCUMENT_ID)!!
+            mBoardDocumentId = intent.getStringExtra(Constants.DOCUMENT_ID)!!
         }
 
         // Show the progress dialog.
         showProgressDialog(resources.getString(R.string.please_wait))
-        FireStoreClass().getBoardDetails(this@TaskListActivity, boardDocumentId)
+        FireStoreClass().getBoardDetails(this@TaskListActivity, mBoardDocumentId)
     }
 
+    //reload screen everytime, better for user experience, more requests on database
+//    override fun onResume() {
+//        super.onResume()
+//        showProgressDialog(resources.getString(R.string.please_wait))
+//        FireStoreClass().getBoardDetails(this@TaskListActivity, mBoardDocumentId)
+//    }
+    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+        super.onActivityResult(requestCode, resultCode, data)
+        if(resultCode == Activity.RESULT_OK && requestCode == MEMBER_REQUEST_CODE){
+            showProgressDialog(resources.getString(R.string.please_wait))
+            FireStoreClass().getBoardDetails(this@TaskListActivity, mBoardDocumentId)
+        }else{
+            Log.e("Cancelled","Cancelled")
+        }
+    }
     /**
      * A function to setup action bar
      */
@@ -60,6 +73,9 @@ class TaskListActivity : BaseActivity() {
         toolbarTaskListActivity?.setNavigationOnClickListener { onBackPressed() }
     }
 
+    fun cardDetails(taskListPosition: Int, cardPosition: Int){
+        startActivity(Intent(this, CardDetailsActivity::class.java))
+    }
     override fun onCreateOptionsMenu(menu: Menu?): Boolean {
         // Inflate the menu to use in the action bar
         menuInflater.inflate(R.menu.menu_members, menu)
@@ -74,7 +90,7 @@ class TaskListActivity : BaseActivity() {
 
                 val intent = Intent(this@TaskListActivity, MembersActivity::class.java)
                 intent.putExtra(Constants.BOARD_DETAIL, mBoardDetails)
-                startActivity(intent)
+                startActivityForResult(intent, MEMBER_REQUEST_CODE)
 
                 return true
             }
@@ -186,5 +202,9 @@ class TaskListActivity : BaseActivity() {
 
         showProgressDialog(resources.getString(R.string.please_wait))
         FireStoreClass().addUpdateTaskList(this@TaskListActivity, mBoardDetails)
+    }
+
+    companion object{
+        const val MEMBER_REQUEST_CODE: Int = 13
     }
 }
